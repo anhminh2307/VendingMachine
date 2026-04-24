@@ -1,0 +1,136 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// --- ENUMS ---
+
+enum UserRole {
+  ADMIN
+  FILLER
+}
+
+enum MachineStatus {
+  ACTIVE
+  INACTIVE
+  MAINTENANCE
+}
+
+enum TicketStatus {
+  PENDING
+  COMPLETED
+  CANCELED
+}
+
+// --- MODELS ---
+
+model User {
+  id           String   @id @default(uuid())
+  username     String   @unique
+  password     String
+  cccd         String   @unique
+  avatarUrl    String?
+  role         UserRole
+  ticketsAssigned Ticket[] @relation("AssignedTickets")
+  ticketLogs      TicketItemLog[]
+  assignments     MachineAssignment[]
+}
+
+model Machine {
+  id        String   @id @default(uuid())
+  name      String
+  location  String
+  status    MachineStatus @default(ACTIVE)
+  floors    Floor[]
+  tickets   Ticket[]
+  assignments MachineAssignment[]
+}
+
+model MachineAssignment {
+  id        String @id @default(uuid())
+  machine   Machine @relation(fields: [machineId], references: [id])
+  machineId String
+
+  user      User @relation(fields: [userId], references: [id])
+  userId    String
+
+  @@unique([machineId, userId])
+}
+
+model Floor {
+  id        String   @id @default(uuid())
+  machine   Machine  @relation(fields: [machineId], references: [id])
+  machineId String
+  floorNumber Int
+  slots     Slot[]
+
+  @@unique([machineId, floorNumber])
+}
+
+model Slot {
+  id          String @id @default(uuid())
+  floor       Floor  @relation(fields: [floorId], references: [id])
+  floorId     String
+  slotNumber  Int
+  product     Product? @relation(fields: [productId], references: [id])
+  productId   String?
+  currentQty  Int     @default(0)
+  maxCapacity Int     @default(10)
+  ticketItems TicketItem[]
+
+  @@unique([floorId, slotNumber])
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  sku         String   @unique
+  price       Float
+  imageUrl    String?
+
+  slots       Slot[]
+  ticketItems TicketItem[]
+}
+
+model Ticket {
+  id            String @id @default(uuid())
+  machine       Machine @relation(fields: [machineId], references: [id])
+  machineId     String
+  assignedTo    User @relation("AssignedTickets", fields: [assignedToId], references: [id])
+  assignedToId  String
+  status        TicketStatus @default(PENDING)
+  createdAt     DateTime @default(now())
+  items         TicketItem[]
+}
+
+model TicketItem {
+  id        String @id @default(uuid())
+  ticket    Ticket @relation(fields: [ticketId], references: [id])
+  ticketId  String
+  slot      Slot   @relation(fields: [slotId], references: [id])
+  slotId    String
+  product   Product @relation(fields: [productId], references: [id])
+  productId String
+  expectedQty Int
+  actualQty   Int?
+  createdAt   DateTime @default(now())
+  logs        TicketItemLog[]
+  @@unique([ticketId, slotId])
+}
+
+model TicketItemLog {
+  id            String @id @default(uuid())
+  ticketItem    TicketItem @relation(fields: [ticketItemId], references: [id])
+  ticketItemId  String
+  changedBy     User @relation(fields: [userId], references: [id])
+  userId        String
+  oldQty        Int?
+  newQty        Int
+  createdAt     DateTime @default(now())
+}
