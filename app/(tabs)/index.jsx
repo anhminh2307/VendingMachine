@@ -2,9 +2,11 @@ import { StyleSheet, Text, View } from 'react-native'
 import { Link } from 'expo-router'
 
 //themed component
-import ThemedView from '../components/ThemedView'
-import ThemedText from '../components/ThemedText'
-import Spacer from '../components/Spacer'
+import ThemedView from '../../components/ThemedView'
+import ThemedText from '../../components/ThemedText'
+import ThemedButton from '../../components/ThemedButton'
+import ThemedTextInput from '../../components/ThemedTextInput'
+import Spacer from '../../components/Spacer'
 
 const Home = () => {
   return (
@@ -12,11 +14,6 @@ const Home = () => {
         <Spacer height={20}/>
 
         <ThemedText style={styles.title} title={true}>Trang chủ</ThemedText>
-
-        <Spacer height={20}/>
-        <ThemedText>Vending Machine app</ThemedText>
-
-
     </ThemedView>
   )
 }

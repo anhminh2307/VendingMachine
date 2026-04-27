@@ -39,7 +39,7 @@ const Login = () => {
         }
 
         if(data.username === username && data.password === password){
-            router.replace('/')
+            router.replace('/(tabs)/')
         } else {
             setError("Mật khẩu không đúng")
         }
