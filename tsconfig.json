@@ -2,7 +2,8 @@
   "compilerOptions": {
     "types": [
       "node",
-      "multer"
+      "multer",
+      "jest",
     ]
   },
   "extends": "expo/tsconfig.base"
