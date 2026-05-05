@@ -3,6 +3,8 @@ import { Link, useRouter } from 'expo-router'
 import { Colors } from '../../constants/Colors'
 import { useState } from 'react'
 import { supabase } from '../../lib/supabase'
+import { useAuth } from '../../context/AuthContext'
+import * as Crypto from 'expo-crypto';
 
 // themed component
 import ThemedView from '../../components/ThemedView'
@@ -12,6 +14,7 @@ import ThemedTextInput from '../../components/ThemedTextInput'
 import Spacer from '../../components/Spacer'
 
 const Login = () => {
+    const { setUser } = useAuth()
     const colorScheme = useColorScheme()
     const theme = Colors[colorScheme] ?? Colors.light
 
@@ -38,8 +41,20 @@ const Login = () => {
             return;
         }
 
-        if(data.username === username && data.password === password){
-            router.replace('/(tabs)/employees')
+        const hashedPassword = await Crypto.digestStringAsync(
+            Crypto.CryptoDigestAlgorithm.SHA256,
+            password
+        );
+
+        if(data.username === username && data.password === hashedPassword){
+            setUser({
+                id: data.id,
+                username: data.username,
+                cccd: data.cccd,
+                avatarUrl: data.avatarUrl,
+                role: data.role,
+            });
+            router.replace('/(tabs)/profile')
         } else {
             setError("Mật khẩu không đúng")
         }

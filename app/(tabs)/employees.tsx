@@ -1,90 +1,20 @@
-import { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, Modal, TextInput, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity,
+  Modal, TextInput, ActivityIndicator, Image, 
+  TouchableWithoutFeedback,
+  Keyboard} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { supabase } from '../../lib/supabase';
-import { Colors } from '../../constants/Colors';
-
-
-interface Employee {
-  id: string;
-  username: string;
-  cccd: string;
-  role: 'ADMIN' | 'FILLER';
-  avatarUrl?: string;
-}
+import { useEmployees } from '../../hooks/useEmployees';
 
 export default function EmployeesScreen() {
-  const [employees, setEmployees] = useState<Employee[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [modalVisible, setModalVisible] = useState(false);
-
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [cccd, setCccd] = useState('');
-
-  const clearForm = () => {
-    setUsername('');
-    setPassword('');
-    setCccd('');
-  };
-
-  useEffect(() => {
-    fetchEmployees();
-  }, []);
-  // Lấy danh sách
-  const fetchEmployees = async () => {
-    setLoading(true);
-    const { data, error } = await supabase
-      .from('User')
-      .select('*')
-      .order('username', { ascending: true });
-
-    if (error) Alert.alert('Lỗi', error.message);
-    else setEmployees(data || []);
-    setLoading(false);
-  };
-
-  // Thêm
-  const handleAddEmployee = async () => {
-    if (!username || !password || !cccd) {
-      Alert.alert('Thông báo', 'Vui lòng điền đủ thông tin');
-      return;
-    }
-
-    const { error } = await supabase.from('User').insert([
-      {
-        username,
-        password,
-        cccd,
-        role: 'FILLER',
-      },
-    ]);
-
-    if (error) {
-      Alert.alert('Lỗi thêm nhân viên', error.message);
-    } else {
-      setModalVisible(false);
-      clearForm();
-      fetchEmployees();
-    }
-  };
-
-  // Xóa
-  const handleDelete = async (id: string) => {
-    Alert.alert('Xác nhận', 'Bạn có chắc muốn xóa nhân viên này?', [
-      { text: 'Hủy', style: 'cancel' },
-      { 
-        text: 'Xóa', 
-        style: 'destructive', 
-        onPress: async () => {
-          const { error } = await supabase.from('User').delete().eq('id', id);
-          if (error) Alert.alert('Lỗi', error.message);
-          else fetchEmployees();
-        }
-      },
-    ]);
-  };
-
+  const {
+    employees, loading, saving,
+    modalVisible, openModal, closeModal,
+    username, setUsername,
+    password, setPassword,
+    cccd, setCccd,
+    avatarImage, handlePickAvatar,
+    handleAddEmployee, handleDelete,
+  } = useEmployees();
 
   return (
     <View style={styles.container}>
@@ -96,106 +26,142 @@ export default function EmployeesScreen() {
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <View style={styles.card}>
+              {/* Avatar */}
+              {item.avatarUrl ? (
+                <Image source={{ uri: item.avatarUrl }} style={styles.avatar} />
+              ) : (
+                <View style={styles.avatarPlaceholder}>
+                  <Ionicons name="person" size={24} color="#aaa" />
+                </View>
+              )}
+
               <View style={styles.info}>
                 <Text style={styles.name}>{item.username}</Text>
                 <Text style={styles.subText}>CCCD: {item.cccd}</Text>
                 <Text style={styles.roleTag}>{item.role}</Text>
               </View>
-              <View style={styles.actions}>
-                <TouchableOpacity onPress={() => handleDelete(item.id)}>
-                  <Ionicons name="trash-outline" size={22} color="red" />
-                </TouchableOpacity>
-              </View>
+
+              <TouchableOpacity onPress={() => handleDelete(item.id)}>
+                <Ionicons name="trash-outline" size={22} color="red" />
+              </TouchableOpacity>
             </View>
           )}
         />
       )}
 
-      {/* Nút (+) */}
-      <TouchableOpacity 
-        style={styles.fab} 
-        onPress={() => setModalVisible(true)}
-      >
+      <TouchableOpacity style={styles.fab} onPress={openModal}>
         <Ionicons name="add" size={30} color="white" />
       </TouchableOpacity>
 
-      {/* Modal Thêm nhân viên */}
-      <Modal visible={modalVisible} animationType="slide" transparent>
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Thêm nhân viên mới</Text>
-            
-            <TextInput 
-              placeholder="Tên đăng nhập" 
-              style={styles.input} 
-              value={username} 
-              onChangeText={setUsername} 
-            />
-            <TextInput 
-              placeholder="Mật khẩu" 
-              style={styles.input} 
-              secureTextEntry 
-              value={password} 
-              onChangeText={setPassword} 
-            />
-            <TextInput 
-              placeholder="Số CCCD" 
-              style={styles.input} 
-              keyboardType="numeric"
-              value={cccd} 
-              onChangeText={setCccd} 
-            />
+        <Modal visible={modalVisible} animationType="slide" transparent>
+          <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContent}>
+                <Text style={styles.modalTitle}>Thêm nhân viên mới</Text>
 
-            <View style={styles.modalButtons}>
-              <TouchableOpacity style={[styles.btn, styles.btnCancel]} onPress={() => setModalVisible(false)}>
-                <Text>Hủy</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={[styles.btn, styles.btnSave]} onPress={handleAddEmployee}>
-                <Text style={{ color: 'white' }}>Lưu</Text>
-              </TouchableOpacity>
+                {/* Avatar Picker */}
+                <TouchableOpacity style={styles.avatarPicker} onPress={handlePickAvatar}>
+                  {avatarImage ? (
+                    <Image source={{ uri: avatarImage.uri }} style={styles.avatarPreview} />
+                  ) : (
+                    <>
+                      <Ionicons name="camera-outline" size={28} color="#888" />
+                      <Text style={styles.avatarHint}>Chọn ảnh đại diện</Text>
+                    </>
+                  )}
+                </TouchableOpacity>
+
+                <TextInput
+                  placeholder="Tên đăng nhập"
+                  style={styles.input}
+                  value={username}
+                  onChangeText={setUsername}
+                  placeholderTextColor= '#888888'
+                />
+                <TextInput
+                  placeholder="Mật khẩu"
+                  style={styles.input}
+                  secureTextEntry
+                  value={password}
+                  placeholderTextColor= '#888888'
+                  onChangeText={setPassword}
+                />
+                <TextInput
+                  placeholder="Số CCCD"
+                  style={styles.input}
+                  keyboardType="numeric"
+                  value={cccd}
+                  placeholderTextColor= '#888888'
+                  onChangeText={setCccd}
+                />
+
+                <View style={styles.modalButtons}>
+                  <TouchableOpacity style={[styles.btn, styles.btnCancel]} onPress={closeModal}>
+                    <Text>Hủy</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.btn, styles.btnSave]}
+                    onPress={handleAddEmployee}
+                    disabled={saving}
+                  >
+                    {saving
+                      ? <ActivityIndicator color="white" size="small" />
+                      : <Text style={{ color: 'white' }}>Lưu</Text>
+                    }
+                  </TouchableOpacity>
+                </View>
+              </View>
             </View>
-          </View>
-        </View>
-      </Modal>
+          </TouchableWithoutFeedback>
+        </Modal>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f8f9fa' },
-  card: { 
-    flexDirection: 'row', 
-    backgroundColor: 'white', 
-    marginHorizontal: 15, 
-    marginTop: 10, 
-    padding: 15, 
+  card: {
+    flexDirection: 'row',
+    backgroundColor: 'white',
+    marginHorizontal: 15,
+    marginTop: 10,
+    padding: 15,
     borderRadius: 10,
     elevation: 3,
-    justifyContent: 'space-between',
-    alignItems: 'center'
+    alignItems: 'center',
+    gap: 12,
+  },
+  avatar: { width: 48, height: 48, borderRadius: 24 },
+  avatarPlaceholder: {
+    width: 48, height: 48, borderRadius: 24,
+    backgroundColor: '#eee',
+    justifyContent: 'center', alignItems: 'center',
   },
   info: { flex: 1 },
-  name: { fontSize: 18, fontWeight: 'bold' },
-  subText: { color: '#666', marginVertical: 4 },
+  name: { fontSize: 16, fontWeight: 'bold' },
+  subText: { color: '#666', marginVertical: 2 },
   roleTag: { color: 'blue', fontSize: 12, fontWeight: 'bold' },
-  actions: { flexDirection: 'row' },
   fab: {
-    position: 'absolute',
-    right: 20,
-    bottom: 20,
+    position: 'absolute', right: 20, bottom: 20,
     backgroundColor: '#2f95dc',
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 5,
+    width: 60, height: 60, borderRadius: 30,
+    justifyContent: 'center', alignItems: 'center', elevation: 5,
   },
   modalOverlay: { flex: 1, justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' },
   modalContent: { backgroundColor: 'white', margin: 20, padding: 20, borderRadius: 15 },
   modalTitle: { fontSize: 20, fontWeight: 'bold', marginBottom: 15, textAlign: 'center' },
-  input: { borderWidth: 1, borderColor: '#ddd', padding: 12, borderRadius: 8, marginBottom: 15 },
-  modalButtons: { flexDirection: 'row', justifyContent: 'space-between' },
+  avatarPicker: {
+    alignSelf: 'center',
+    width: 90, height: 90, borderRadius: 45,
+    backgroundColor: '#f0f0f0',
+    justifyContent: 'center', alignItems: 'center',
+    marginBottom: 15,
+    borderWidth: 1, borderColor: '#ddd', borderStyle: 'dashed',
+  },
+  avatarPreview: { width: 90, height: 90, borderRadius: 45 },
+  avatarHint: { fontSize: 11, color: '#888', marginTop: 4 },
+  input: { borderWidth: 1, borderColor: '#ddd', padding: 12, borderRadius: 8, marginBottom: 12 },
+  modalButtons: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 4 },
   btn: { padding: 12, borderRadius: 8, width: '45%', alignItems: 'center' },
   btnCancel: { backgroundColor: '#eee' },
   btnSave: { backgroundColor: '#2f95dc' },

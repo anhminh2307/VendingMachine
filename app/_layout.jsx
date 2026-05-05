@@ -3,6 +3,7 @@ import { useRouter, Stack } from 'expo-router'
 import { useEffect } from 'react'
 import { Colors } from "../constants/Colors"
 import { StatusBar } from 'expo-status-bar'
+import { AuthProvider } from '../context/AuthContext'
 
 
 const RootLayout = () => {
@@ -20,14 +21,16 @@ const RootLayout = () => {
 
   return (
     <>
-        <StatusBar value="auto" />
-        <Stack screenOptions={{
-            headerStyle: { backgroundColor: theme.navBackground },
-            headerTintColor: theme.title,
-        }}>
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        </Stack>
+        <AuthProvider>
+            <StatusBar value="auto" />
+            <Stack screenOptions={{
+                headerStyle: { backgroundColor: theme.navBackground },
+                headerTintColor: theme.title,
+            }}>
+                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            </Stack>
+        </AuthProvider>
     </>
   )
 }

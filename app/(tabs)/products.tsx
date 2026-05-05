@@ -8,5 +8,3 @@ export default function ProductsScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create();
