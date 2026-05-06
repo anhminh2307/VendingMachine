@@ -39,6 +39,7 @@ const TabLayout = () => {
         name="products"
         options={{
           title: 'Sản phẩm',
+          href: isAdmin ? undefined : null,
           tabBarIcon: ({ color }) => <Ionicons name='cube-outline' size={24} color={color} />,
         }}
       />
@@ -48,6 +49,7 @@ const TabLayout = () => {
         name="machines"
         options={{
           title: 'Máy bán hàng',
+          href: isAdmin ? undefined : null,
           tabBarIcon: ({ color }) => <Ionicons name='hardware-chip-outline' size={24} color={color} />,
         }}
       />

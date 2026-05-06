@@ -41,3 +41,25 @@ export const uploadAvatar = async (
   const { data } = supabase.storage.from('avatars').getPublicUrl(filePath);
   return data.publicUrl;
 };
+
+export const uploadProductImage = async (
+  imageAsset: ImagePicker.ImagePickerAsset,
+  productId: string
+): Promise<string> => {
+  if (!imageAsset.base64) throw new Error('Không có dữ liệu ảnh');
+
+  const ext = imageAsset.uri.split('.').pop() || 'jpg';
+  const filePath = `products/${productId}_${Date.now()}.${ext}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from('products')
+    .upload(filePath, decode(imageAsset.base64), {
+      contentType: imageAsset.mimeType || 'image/jpeg',
+      upsert: true,
+    });
+
+  if (uploadError) throw uploadError;
+
+  const { data } = supabase.storage.from('products').getPublicUrl(filePath);
+  return data.publicUrl;
+};
