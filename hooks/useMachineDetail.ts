@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useFocusEffect } from 'expo-router';
 import { Alert } from 'react-native';
 import {
   MachineDetail, Slot,
@@ -8,12 +9,15 @@ import {
 } from '../services/machineService';
 import { getProducts, Product } from '../services/productService';
 import { useAuth } from '../context/AuthContext';
+import { checkCanFill } from '../services/ticketService';
+
 
 export const useMachineDetail = (machineId: string) => {
   const { user } = useAuth();
   const isAdmin = user?.role === 'ADMIN';
 
   const [machine, setMachine] = useState<MachineDetail | null>(null);
+  const [canFill, setCanFill] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -34,14 +38,25 @@ export const useMachineDetail = (machineId: string) => {
       ]);
       setMachine(machineData);
       setProducts(productData);
+
+      if (!isAdmin && user) {
+        const hasTicket = await checkCanFill(user.id, machineId);
+        setCanFill(hasTicket);
+      }
     } catch (e: any) {
       Alert.alert('Lỗi', e.message);
     } finally {
       setLoading(false);
     }
-  }, [machineId]);
+  }, [machineId, isAdmin, user]);
 
-  useEffect(() => { fetchDetail(); }, [fetchDetail]);
+  const canEditSlot = isAdmin || canFill;
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchDetail();
+    }, [fetchDetail])
+  );
 
   const openSlotModal = (slot: Slot) => {
     setSelectedSlot(slot);
@@ -156,6 +171,6 @@ export const useMachineDetail = (machineId: string) => {
     openSlotModal, closeSlotModal,
     handleUpdateSlotProduct, handleUpdateQty,
     handleAddFloor, handleDeleteFloor,
-    handleAddSlot, handleDeleteSlot,
+    handleAddSlot, handleDeleteSlot, canFill, canEditSlot
   };
 };

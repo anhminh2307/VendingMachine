@@ -36,9 +36,6 @@ export default function ProfileScreen() {
           </View>
         )}
         <Text style={styles.username}>{user.username}</Text>
-        <View style={[styles.roleBadge, user.role === 'ADMIN' ? styles.badgeAdmin : styles.badgeFiller]}>
-          <Text style={styles.roleText}>{user.role}</Text>
-        </View>
       </View>
 
       {/* Thông tin chi tiết */}

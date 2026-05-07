@@ -28,6 +28,16 @@ const TabLayout = () => {
       <Tabs.Screen
         name='machines/[id]'
         options={{
+          headerShown: false,
+          href: null
+        }}
+      />
+
+      {/* ticket id */}
+      <Tabs.Screen
+        name='tickets/[id]'
+        options={{
+          headerShown: false,
           href: null
         }}
       />
@@ -57,6 +67,7 @@ const TabLayout = () => {
         name="machines"
         options={{
           title: 'Máy bán hàng',
+          href: isAdmin ? undefined : null,
           tabBarIcon: ({ color }) => <Ionicons name='hardware-chip-outline' size={24} color={color} />,
         }}
       />
@@ -67,6 +78,14 @@ const TabLayout = () => {
         options={{
           title: 'Vé',
           tabBarIcon: ({ color }) => <Ionicons name='ticket-outline' size={24} color={color} />,
+        }}
+      />
+
+      <Tabs.Screen
+        name="tickets/fill/[ticketId]"
+        options={{
+          href: null,
+          headerShown: false,
         }}
       />
 

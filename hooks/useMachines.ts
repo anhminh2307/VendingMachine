@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useFocusEffect } from 'expo-router';
 import { Alert } from 'react-native';
 import {
   Machine, MachineStatus,
@@ -50,7 +51,11 @@ export const useMachines = () => {
     }
   }, []);
 
-  useEffect(() => { fetchMachines(); }, [fetchMachines]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchMachines();
+    }, [fetchMachines])
+  );
 
   const handleSave = async () => {
     if (!name || !location) {

@@ -1,14 +1,20 @@
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity,
-  Modal, ActivityIndicator, Image } from 'react-native';
+  Modal, ActivityIndicator, Image, 
+  Alert} from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useMachineDetail } from '../../../hooks/useMachineDetail';
 import { Slot } from '../../../services/machineService';
+import Spacer from '../../../components/Spacer';
+import { useAuth } from '../../../context/AuthContext';
+import { completeTicket } from '../../../services/ticketService';
 
 
 export default function MachineDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { id, ticketId } = useLocalSearchParams<{ id: string; ticketId?: string }>();
   const router = useRouter();
+  const { user } = useAuth();
+  const isFillerOnTicket = !!ticketId && user?.role === 'FILLER';
   const {
     machine, products, loading, saving, isAdmin,
     slotModalVisible, selectedSlot,
@@ -18,11 +24,31 @@ export default function MachineDetailScreen() {
     openSlotModal, closeSlotModal,
     handleUpdateSlotProduct, handleUpdateQty,
     handleAddFloor, handleDeleteFloor,
-    handleAddSlot, handleDeleteSlot,
+    handleAddSlot, handleDeleteSlot, canFill, canEditSlot
   } = useMachineDetail(id);
 
   if (loading) return <ActivityIndicator size="large" style={{ marginTop: 40 }} />;
   if (!machine) return null;
+
+  const handleCompleteTicket = async () => {
+    if (!ticketId) return;
+    Alert.alert('Xác nhận', 'Bạn đã fill xong tất cả hàng?', [
+      { text: 'Hủy', style: 'cancel' },
+        {
+          text: 'Hoàn thành',
+          onPress: async () => {
+            try {
+              await completeTicket(ticketId);
+              Alert.alert('Thành công', 'Phiếu đã được xác nhận!', [
+                { text: 'OK', onPress: () => router.replace('/(tabs)/tickets') }
+              ]);
+            } catch (e: any) {
+              Alert.alert('Lỗi', e.message);
+            }
+          }
+        }
+      ]);
+    };
 
   const renderSlot = (slot: Slot, floorNumber: number) => {
     const isFull = slot.currentQty >= slot.maxCapacity;
@@ -33,7 +59,13 @@ export default function MachineDetailScreen() {
       <TouchableOpacity
         key={slot.id}
         style={styles.slotCard}
-        onPress={() => openSlotModal(slot)}
+        onPress={() => {
+          if (!canEditSlot) {
+            Alert.alert('Thông báo', 'Bạn không được phân công phiếu cho máy này');
+            return;
+          }
+          openSlotModal(slot);
+        }}
       >
         <View style={[styles.slotCodeBadge, { backgroundColor: fillColor }]}>
           <Text style={styles.slotCode}>{slot.slotCode}</Text>
@@ -73,6 +105,7 @@ export default function MachineDetailScreen() {
 
   return (
     <View style={styles.container}>
+      <Spacer height={40}/>
       {/* Header máy */}
       <View style={styles.machineHeader}>
         <TouchableOpacity onPress={() => router.replace('/(tabs)/machines')}>
@@ -80,7 +113,7 @@ export default function MachineDetailScreen() {
         </TouchableOpacity>
         <View style={styles.machineHeaderInfo}>
           <Text style={styles.machineName}>{machine.name}</Text>
-          <Text style={styles.machineLocation}>📍 {machine.location}</Text>
+          <Text style={styles.machineLocation}>{machine.location}</Text>
         </View>
         <View style={[styles.statusDot,
           { backgroundColor: machine.status === 'ACTIVE' ? '#4CAF50' : '#aaa' }
@@ -100,7 +133,7 @@ export default function MachineDetailScreen() {
                     onPress={() => handleAddSlot(floor.id, floor.floorNumber, floor.Slots.length)}
                   >
                     <Ionicons name="add" size={16} color="#2f95dc" />
-                    <Text style={styles.addSlotText}>Thêm slot</Text>
+                    <Text style={styles.addSlotText}>Thêm ô</Text>
                   </TouchableOpacity>
                   <TouchableOpacity onPress={() => handleDeleteFloor(floor.id)}>
                     <Ionicons name="trash-outline" size={18} color="#ff4444" />
@@ -111,7 +144,7 @@ export default function MachineDetailScreen() {
 
             {/* Slots */}
             {floor.Slots.length === 0 ? (
-              <Text style={styles.emptySlot}>Chưa có slot nào</Text>
+              <Text style={styles.emptySlot}>Chưa có ô nào</Text>
             ) : (
               floor.Slots.map(slot => renderSlot(slot, floor.floorNumber))
             )}
@@ -261,6 +294,15 @@ export default function MachineDetailScreen() {
           </View>
         </View>
       </Modal>
+
+      {isFillerOnTicket && (
+        <View style={styles.bottomBar}>
+          <TouchableOpacity style={styles.completeBtn} onPress={handleCompleteTicket}>
+            <Ionicons name="checkmark-circle-outline" size={20} color="white" />
+            <Text style={styles.completeBtnText}>Xác nhận hoàn thành fill</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 }
@@ -380,4 +422,13 @@ const styles = StyleSheet.create({
     borderColor: '#ff4444',
     backgroundColor: '#fff0f0',
   },
+  bottomBar: {
+  position: 'absolute', bottom: 0, left: 0, right: 0,
+  padding: 16, backgroundColor: 'white', elevation: 8,
+  },
+  completeBtn: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+    backgroundColor: '#4CAF50', padding: 15, borderRadius: 12, gap: 8,
+  },
+  completeBtnText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
 });

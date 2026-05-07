@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useFocusEffect } from 'expo-router';
 import { Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import {
@@ -67,9 +68,11 @@ export const useProducts = () => {
     }
   }, []);
 
-  useEffect(() => {
-    fetchProducts();
-  }, [fetchProducts]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchProducts();
+    }, [fetchProducts])
+  );
 
   const handlePickImage = async () => {
     try {

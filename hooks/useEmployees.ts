@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useFocusEffect } from 'expo-router';
 import { Alert } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import {
@@ -46,9 +47,11 @@ export const useEmployees = () => {
     }
   }, []);
 
-  useEffect(() => {
-    fetchEmployees();
-  }, [fetchEmployees]);
+  useFocusEffect(
+    useCallback(() => {
+      fetchEmployees();
+    }, [fetchEmployees])
+  );
 
   const handlePickAvatar = async () => {
     try {
