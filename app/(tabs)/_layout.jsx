@@ -24,6 +24,14 @@ const TabLayout = () => {
         }}
       />
 
+      {/* machine id */}
+      <Tabs.Screen
+        name='machines/[id]'
+        options={{
+          href: null
+        }}
+      />
+
       {/* Nhân viên */}
       <Tabs.Screen
         name="employees"
@@ -49,7 +57,6 @@ const TabLayout = () => {
         name="machines"
         options={{
           title: 'Máy bán hàng',
-          href: isAdmin ? undefined : null,
           tabBarIcon: ({ color }) => <Ionicons name='hardware-chip-outline' size={24} color={color} />,
         }}
       />

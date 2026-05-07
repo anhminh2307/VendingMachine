@@ -92,6 +92,7 @@ export default function ProductsScreen() {
 
             <TextInput
               placeholder="Tên sản phẩm"
+              placeholderTextColor='#8888'
               style={styles.input}
               value={name}
               onChangeText={setName}
@@ -99,6 +100,7 @@ export default function ProductsScreen() {
 
             <TextInput
               placeholder="Giá (VNĐ)"
+              placeholderTextColor='#8888'
               style={styles.input}
               value={price}
               onChangeText={setPrice}
