@@ -44,7 +44,7 @@ export const useMachineDetail = (machineId: string) => {
         setCanFill(hasTicket);
       }
     } catch (e: any) {
-      Alert.alert('Lỗi', e.message);
+      Alert.alert('Lỗi');
     } finally {
       setLoading(false);
     }
@@ -83,7 +83,7 @@ export const useMachineDetail = (machineId: string) => {
       );
       closeSlotModal(); fetchDetail();
     } catch (e: any) {
-      Alert.alert('Lỗi', e.message);
+      Alert.alert('Lỗi');
     } finally {
       setSaving(false);
     }
@@ -104,7 +104,7 @@ export const useMachineDetail = (machineId: string) => {
       await updateSlotQuantity(selectedSlot.id, qty);
       closeSlotModal(); fetchDetail();
     } catch (e: any) {
-      Alert.alert('Lỗi', e.message);
+      Alert.alert('Lỗi');
     } finally {
       setSaving(false);
     }
@@ -118,7 +118,7 @@ export const useMachineDetail = (machineId: string) => {
       await addFloor(machineId, nextFloorNumber);
       fetchDetail();
     } catch (e: any) {
-      Alert.alert('Lỗi', e.message);
+      Alert.alert('Lỗi');
     }
   };
 
@@ -130,7 +130,7 @@ export const useMachineDetail = (machineId: string) => {
         text: 'Xóa', style: 'destructive',
         onPress: async () => {
           try { await deleteFloor(floorId); fetchDetail(); }
-          catch (e: any) { Alert.alert('Lỗi', e.message); }
+          catch (e: any) { Alert.alert('Lỗi'); }
         },
       },
     ]);
@@ -144,7 +144,7 @@ export const useMachineDetail = (machineId: string) => {
       await addSlot(floorId, slotNumber, slotCode);
       fetchDetail();
     } catch (e: any) {
-      Alert.alert('Lỗi', e.message);
+      Alert.alert('Lỗi');
     }
   };
 
@@ -156,7 +156,7 @@ export const useMachineDetail = (machineId: string) => {
         text: 'Xóa', style: 'destructive',
         onPress: async () => {
           try { await deleteSlot(slotId); fetchDetail(); }
-          catch (e: any) { Alert.alert('Lỗi', e.message); }
+          catch (e: any) { Alert.alert('Lỗi'); }
         },
       },
     ]);

@@ -14,7 +14,10 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "bundleIdentifier": "com.yourapp.vendingmanager",
+      "infoPlist": {
+        "UIBackgroundModes": ["remote-notification"]  
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -36,6 +39,16 @@
         {
           "photosPermission": "Ứng dụng cần quyền truy cập ảnh để đặt avatar.",
           "cameraPermission": "Ứng dụng cần quyền camera để chụp ảnh avatar."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#2f95dc",
+          "sounds": [],
+          "androidMode": "default",
+          "androidCollapsedTitle": "Phiếu fill hàng mới"
         }
       ]
     ]

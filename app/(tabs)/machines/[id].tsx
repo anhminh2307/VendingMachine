@@ -43,7 +43,7 @@ export default function MachineDetailScreen() {
                 { text: 'OK', onPress: () => router.replace('/(tabs)/tickets') }
               ]);
             } catch (e: any) {
-              Alert.alert('Lỗi', e.message);
+              Alert.alert('Lỗi');
             }
           }
         }

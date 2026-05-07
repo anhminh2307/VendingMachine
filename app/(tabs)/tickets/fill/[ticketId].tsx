@@ -62,7 +62,7 @@ export default function FillScreen() {
       });
       setFillMap(map);
     } catch (e: any) {
-      Alert.alert('Lỗi', e.message);
+      Alert.alert('Lỗi');
     } finally {
       setLoading(false);
     }
@@ -127,7 +127,7 @@ export default function FillScreen() {
         { text: 'OK', onPress: () => router.replace('/(tabs)/tickets') }
       ]);
     } catch (e: any) {
-      Alert.alert('Lỗi', e.message);
+      Alert.alert('Lỗi');
     } finally {
       setSubmitting(false);
     }

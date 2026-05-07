@@ -45,7 +45,7 @@ export const useMachines = () => {
       const data = await getMachines();
       setMachines(data);
     } catch (e: any) {
-      Alert.alert('Lỗi', e.message);
+      Alert.alert('Lỗi');
     } finally {
       setLoading(false);
     }
@@ -71,7 +71,7 @@ export const useMachines = () => {
       }
       closeModal(); fetchMachines();
     } catch (e: any) {
-      Alert.alert('Lỗi', e.message);
+      Alert.alert('Lỗi');
     } finally {
       setSaving(false);
     }
@@ -85,7 +85,7 @@ export const useMachines = () => {
         onPress: async () => {
           try {
             await deleteMachine(id); fetchMachines();
-          } catch (e: any) { Alert.alert('Lỗi', e.message); }
+          } catch (e: any) { Alert.alert('Lỗi'); }
         },
       },
     ]);

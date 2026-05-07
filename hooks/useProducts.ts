@@ -62,7 +62,7 @@ export const useProducts = () => {
       const data = await getProducts();
       setProducts(data);
     } catch (error: any) {
-      Alert.alert('Lỗi', error.message);
+      Alert.alert('Lỗi');
     } finally {
       setLoading(false);
     }
@@ -79,7 +79,7 @@ export const useProducts = () => {
       const picked = await pickAvatarImage();
       if (picked) setImage(picked);
     } catch (error: any) {
-      Alert.alert('Lỗi', error.message);
+      Alert.alert('Lỗi');
     }
   };
 
@@ -104,7 +104,7 @@ export const useProducts = () => {
       closeModal();
       fetchProducts();
     } catch (error: any) {
-      Alert.alert('Lỗi', error.message);
+      Alert.alert('Lỗi');
     } finally {
       setSaving(false);
     }
@@ -121,7 +121,7 @@ export const useProducts = () => {
             await deleteProduct(id);
             fetchProducts();
           } catch (error: any) {
-            Alert.alert('Lỗi', error.message);
+            Alert.alert('Lỗi');
           }
         },
       },

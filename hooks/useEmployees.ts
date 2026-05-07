@@ -41,7 +41,7 @@ export const useEmployees = () => {
       const data = await getEmployees();
       setEmployees(data);
     } catch (error: any) {
-      Alert.alert('Lỗi', error.message);
+      Alert.alert('Lỗi');
     } finally {
       setLoading(false);
     }
@@ -58,7 +58,7 @@ export const useEmployees = () => {
       const image = await pickAvatarImage();
       if (image) setAvatarImage(image);
     } catch (error: any) {
-      Alert.alert('Lỗi', error.message);
+      Alert.alert('Lỗi');
     }
   };
 
@@ -74,7 +74,7 @@ export const useEmployees = () => {
       closeModal();
       fetchEmployees();
     } catch (error: any) {
-      Alert.alert('Lỗi thêm nhân viên', error.message);
+      Alert.alert('Lỗi thêm nhân viên');
     } finally {
       setSaving(false);
     }
@@ -91,7 +91,7 @@ export const useEmployees = () => {
             await deleteEmployee(id);
             fetchEmployees();
           } catch (error: any) {
-            Alert.alert('Lỗi', error.message);
+            Alert.alert('Lỗi');
           }
         },
       },

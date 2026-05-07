@@ -42,7 +42,7 @@ export const useTickets = () => {
       const data = await getTickets(user.id, isAdmin);
       setTickets(data);
     } catch (e: any) {
-      Alert.alert('Lỗi', e.message);
+      Alert.alert('Lỗi');
     } finally {
       setLoading(false);
     }
@@ -68,7 +68,7 @@ export const useTickets = () => {
       setAvailableSlots([]);
       setModalVisible(true);
     } catch (e: any) {
-      Alert.alert('Lỗi', e.message);
+      Alert.alert('Lỗi');
     }
   };
 
@@ -82,7 +82,7 @@ export const useTickets = () => {
         .filter(s => s.productId); // chỉ lấy slot có sản phẩm
       setAvailableSlots(slots);
     } catch (e: any) {
-      Alert.alert('Lỗi', e.message);
+      Alert.alert('Lỗi');
     } finally {
       setLoadingSlots(false);
     }
@@ -122,7 +122,7 @@ export const useTickets = () => {
       setModalVisible(false);
       fetchTickets();
     } catch (e: any) {
-      Alert.alert('Lỗi', e.message);
+      Alert.alert('Lỗi');
     } finally {
       setSaving(false);
     }
@@ -135,7 +135,7 @@ export const useTickets = () => {
         text: 'Xóa', style: 'destructive',
         onPress: async () => {
           try { await deleteTicket(id); fetchTickets(); }
-          catch (e: any) { Alert.alert('Lỗi', e.message); }
+          catch (e: any) { Alert.alert('Lỗi'); }
         },
       },
     ]);

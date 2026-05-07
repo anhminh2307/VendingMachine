@@ -35,7 +35,7 @@ export const useTicketDetail = (ticketId: string) => {
       });
       setActualQties(initial);
     } catch (e: any) {
-      Alert.alert('Lỗi', e.message);
+      Alert.alert('Lỗi');
     } finally {
       setLoading(false);
     }
@@ -70,7 +70,7 @@ export const useTicketDetail = (ticketId: string) => {
             fetchDetail();
             router.back();
           } catch (e: any) {
-            Alert.alert('Lỗi', e.message);
+            Alert.alert('Lỗi');
           } finally {
             setSubmitting(false);
           }
